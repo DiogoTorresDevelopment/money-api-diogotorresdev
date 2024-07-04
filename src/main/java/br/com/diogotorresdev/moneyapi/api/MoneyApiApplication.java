@@ -1,13 +1,9 @@
-package br.com.diogotorresdev.moneyapi;
+package br.com.diogotorresdev.moneyapi.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-
-import br.com.diogotorresdev.moneyapi.config.property.MoneyApiProperty;
 
 @SpringBootApplication
-@EnableConfigurationProperties(MoneyApiProperty.class)
 public class MoneyApiApplication {
 
 	public static void main(String[] args) {
