@@ -4,12 +4,15 @@ import br.com.diogotorresdev.moneyapi.api.event.RecursoCriadoEvent;
 import br.com.diogotorresdev.moneyapi.api.model.Person;
 import br.com.diogotorresdev.moneyapi.api.model.Posting;
 import br.com.diogotorresdev.moneyapi.api.repository.PostingRepository;
+import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
 import br.com.diogotorresdev.moneyapi.api.service.PostingService;
 import br.com.diogotorresdev.moneyapi.api.service.exception.PersonNonexistentOrInactiveException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +40,8 @@ public class PostingResource {
     private MessageSource messageSource;
 
     @GetMapping
-    public List<Posting> list() {
-        return postingRepository.findAll();
+    public Page<Posting> list(PostingFilter postingFilter, Pageable pageable) {
+        return postingRepository.filter(postingFilter, pageable);
     }
 
     @GetMapping("/{id}")
@@ -63,5 +66,10 @@ public class PostingResource {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        postingRepository.delete(id);
+    }
 
 }
