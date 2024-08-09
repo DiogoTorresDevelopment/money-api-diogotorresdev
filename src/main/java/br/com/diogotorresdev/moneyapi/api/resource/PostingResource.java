@@ -5,6 +5,7 @@ import br.com.diogotorresdev.moneyapi.api.model.Person;
 import br.com.diogotorresdev.moneyapi.api.model.Posting;
 import br.com.diogotorresdev.moneyapi.api.repository.PostingRepository;
 import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
+import br.com.diogotorresdev.moneyapi.api.repository.projection.PostingProjection;
 import br.com.diogotorresdev.moneyapi.api.service.PostingService;
 import br.com.diogotorresdev.moneyapi.api.service.exception.PersonNonexistentOrInactiveException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import br.com.diogotorresdev.moneyapi.api.exceptionhandler.MoneyApiExceptionHandler.Error;
 
@@ -40,10 +42,22 @@ public class PostingResource {
     private MessageSource messageSource;
 
     @GetMapping
-    public Page<Posting> list(PostingFilter postingFilter, Pageable pageable) {
-        return postingRepository.filter(postingFilter, pageable);
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
+    public Page<Posting> find(PostingFilter postingFilter, Pageable pageable) {
+        Page<Posting> postings = postingService.find(postingFilter, pageable);
+
+        return postings;
     }
 
+    @GetMapping(params = "projection")
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
+    public Page<PostingProjection> projection(PostingFilter postingFilter, Pageable pageable) {
+        Page<PostingProjection> postings = postingService.projection(postingFilter, pageable);
+
+        return postings;
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
     @GetMapping("/{id}")
     public ResponseEntity<Posting> getById(@PathVariable Long id) {
         Posting existingPosting = postingRepository.findOne(id);
@@ -51,9 +65,10 @@ public class PostingResource {
         return existingPosting!= null? ResponseEntity.ok(existingPosting) : ResponseEntity.notFound().build();
     }
 
+    @PreAuthorize("hasAuthority('ROLE_REGISTER_POSTING') and #oauth2.hasScope('write')")
     @PostMapping
     public ResponseEntity<Posting> save(@Valid @RequestBody Posting posting, HttpServletResponse response) {
-        Posting newPosting = postingService.savePosting(posting);
+        Posting newPosting = postingService.save(posting);
         publisher.publishEvent(new RecursoCriadoEvent(this,response, newPosting.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(newPosting);
     }
@@ -66,6 +81,7 @@ public class PostingResource {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_DELETE_POSTING') and #oauth2.hasScope('write')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

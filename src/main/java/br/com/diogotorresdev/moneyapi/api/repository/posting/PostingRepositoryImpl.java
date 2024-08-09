@@ -1,8 +1,9 @@
 package br.com.diogotorresdev.moneyapi.api.repository.posting;
 
-import br.com.diogotorresdev.moneyapi.api.model.Posting;
+import br.com.diogotorresdev.moneyapi.api.model.*;
+import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
 import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
-import br.com.diogotorresdev.moneyapi.api.model.Posting_;
+import br.com.diogotorresdev.moneyapi.api.repository.projection.PostingProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +40,28 @@ public class PostingRepositoryImpl implements PostingRepositoryQuery {
 
         TypedQuery<Posting> typedQuery = entityManager.createQuery(criteriaQuery);
 
+        addPaginationRestrictions(typedQuery, pageable);
+
+        return new PageImpl<>(typedQuery.getResultList(), pageable, total(postingFilter));
+    }
+
+    @Override
+    public Page<PostingProjection> projection(PostingFilter postingFilter, Pageable pageable) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostingProjection> criteriaQuery = criteriaBuilder.createQuery(PostingProjection.class);
+        Root<Posting> root = criteriaQuery.from(Posting.class);
+
+        criteriaQuery.select(criteriaBuilder.construct(PostingProjection.class,
+                root.get(Posting_.id),root.get(Posting_.postingDescription),
+                root.get(Posting_.dueDate),root.get(Posting_.paymentDate),
+                root.get(Posting_.postingValue), root.get(Posting_.postingType),
+                root.get(Posting_.category).get(Category_.categoryName),
+                root.get(Posting_.person).get(Person_.personName)));
+
+        Predicate[] predicates = createRestrictions(postingFilter, criteriaBuilder, root);
+        criteriaQuery.where(predicates);
+
+        TypedQuery<PostingProjection> typedQuery = entityManager.createQuery(criteriaQuery);
         addPaginationRestrictions(typedQuery, pageable);
 
         return new PageImpl<>(typedQuery.getResultList(), pageable, total(postingFilter));
