@@ -3,7 +3,7 @@ package br.com.diogotorresdev.moneyapi.api.resource;
 import java.net.URI;
 import java.util.List;
 
-import br.com.diogotorresdev.moneyapi.api.event.RecursoCriadoEvent;
+import br.com.diogotorresdev.moneyapi.api.event.ResourceCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -41,7 +41,7 @@ public class CategoryResource {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(newCategory.getId()).toUri();
         response.setHeader("Location", uri.toASCIIString());
 
-        publisher.publishEvent(new RecursoCriadoEvent(this,response, newCategory.getId()));
+        publisher.publishEvent(new ResourceCreatedEvent(this,response, newCategory.getId()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newCategory);
     }

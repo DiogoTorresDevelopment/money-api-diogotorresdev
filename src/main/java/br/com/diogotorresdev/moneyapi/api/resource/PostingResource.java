@@ -1,7 +1,6 @@
 package br.com.diogotorresdev.moneyapi.api.resource;
 
-import br.com.diogotorresdev.moneyapi.api.event.RecursoCriadoEvent;
-import br.com.diogotorresdev.moneyapi.api.model.Person;
+import br.com.diogotorresdev.moneyapi.api.event.ResourceCreatedEvent;
 import br.com.diogotorresdev.moneyapi.api.model.Posting;
 import br.com.diogotorresdev.moneyapi.api.repository.PostingRepository;
 import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
@@ -69,7 +68,7 @@ public class PostingResource {
     @PostMapping
     public ResponseEntity<Posting> save(@Valid @RequestBody Posting posting, HttpServletResponse response) {
         Posting newPosting = postingService.save(posting);
-        publisher.publishEvent(new RecursoCriadoEvent(this,response, newPosting.getId()));
+        publisher.publishEvent(new ResourceCreatedEvent(this,response, newPosting.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(newPosting);
     }
 

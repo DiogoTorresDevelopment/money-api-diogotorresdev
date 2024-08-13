@@ -1,48 +1,55 @@
 package br.com.diogotorresdev.moneyapi.api.cors;
 
-import br.com.diogotorresdev.moneyapi.api.config.property.MoneyApiProperty;
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import br.com.diogotorresdev.moneyapi.api.config.property.MoneyApiProperty;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
 
+    @Autowired
     private MoneyApiProperty moneyApiProperty;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        resp.setHeader("Access-Control-Allow-Origin", moneyApiProperty.getPermittedOrigin());
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
 
-        httpResponse.setHeader("Access-Control-Allow-Origin", moneyApiProperty.getPermittedOrigin());
-        httpResponse.setHeader("Access-Control-Allow-Credentials", "true"); //Tem que ter para o cookie do token seja enviado
+        if ("OPTIONS".equals(req.getMethod())
+                && moneyApiProperty.getPermittedOrigin().equals(req.getHeader("Origin"))) {
+            resp.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+            resp.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+            resp.setHeader("Access-Control-Max-Age", "3600");
 
-        if("OPTIONS".equals(httpRequest.getMethod()) && moneyApiProperty.getPermittedOrigin().equals(httpRequest.getHeader("Origin"))) {
-            httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            httpResponse.setHeader("Access-Control-Allow-Headers","Authorization, Content-Type, Accept");
-            httpResponse.setHeader("Access-Control-Max-Age", "3600");
-
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
-        }else {
-            chain.doFilter(request, response);
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            chain.doFilter(req, resp);
         }
-
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
-
-
 
     @Override
     public void destroy() {

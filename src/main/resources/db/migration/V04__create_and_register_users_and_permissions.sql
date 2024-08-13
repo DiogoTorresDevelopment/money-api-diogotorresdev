@@ -30,7 +30,7 @@ VALUES
         1,
         'admin',
         'admin@moneyapi.com',
-        '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.'
+        '$2a$10$R.c7H8vN.ts.4oS9sYZ3ROYoAi6KzLy3xDkODTrnJVJwdzVcLWnje'
     ),
     (
         2,
