@@ -81,10 +81,19 @@ public class PostingResource {
     }
 
     @PreAuthorize("hasAuthority('ROLE_DELETE_POSTING') and #oauth2.hasScope('write')")
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         postingRepository.delete(id);
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_UPDATE_POSTING') and #oauth2.hasScope('write')")
+    public ResponseEntity<Posting> update(@PathVariable Long id, @RequestBody Posting posting) {
+        Posting postingUpdated = postingService.update(id, posting);
+
+        return ResponseEntity.ok(postingUpdated);
+    }
+
 
 }
