@@ -36,7 +36,7 @@ VALUES
         2,
         'hally',
         'hally@moneyapi.com',
-        '$2a$10$Zc3w6HyuPOPXamaMhh.PQOXvDnEsadztbfi6/RyZWJDzimE8WQjaq'
+        '$2a$10$GA0/UMhd6WovDzrXSaERiOg04LDUPCU7E.CuECBjMo/z0RjBw.oFK'
     );
 
 INSERT INTO

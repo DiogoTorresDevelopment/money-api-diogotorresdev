@@ -30,30 +30,35 @@ public class RefreshTokenPostProcessor implements ResponseBodyAdvice<OAuth2Acces
     }
 
     @Override
-    public OAuth2AccessToken beforeBodyWrite(OAuth2AccessToken body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        HttpServletRequest req = ((ServletServerHttpRequest)request).getServletRequest();
-        HttpServletResponse resp = ((ServletServerHttpResponse)response).getServletResponse();
+    public OAuth2AccessToken beforeBodyWrite(OAuth2AccessToken body, MethodParameter returnType,
+                                             MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                             ServerHttpRequest request, ServerHttpResponse response) {
+
+        HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
+        HttpServletResponse resp = ((ServletServerHttpResponse) response).getServletResponse();
 
         DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) body;
 
         String refreshToken = body.getRefreshToken().getValue();
-        adicionarRefreshTokenNoCookie(refreshToken, req, resp);
-        removeRefreshTokenDoBody(token);
+
+        addRefreshTokenInCookie(refreshToken, req, resp);
+        removeRefreshTokenFromBody(token);
 
         return body;
     }
 
-    private void removeRefreshTokenDoBody(DefaultOAuth2AccessToken token) {
+    private void removeRefreshTokenFromBody(DefaultOAuth2AccessToken token) {
         token.setRefreshToken(null);
     }
 
-    public void adicionarRefreshTokenNoCookie(String refreshToken, HttpServletRequest req, HttpServletResponse resp) {
+    private void addRefreshTokenInCookie(String refreshToken, HttpServletRequest req, HttpServletResponse resp) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(moneyApiProperty.getSecurity().isEnableHttps());
         refreshTokenCookie.setPath(req.getContextPath() + "/oauth/token");
         refreshTokenCookie.setMaxAge(2592000);
+
         resp.addCookie(refreshTokenCookie);
     }
-
 }
