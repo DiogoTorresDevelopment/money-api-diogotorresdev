@@ -1,5 +1,8 @@
 package br.com.diogotorresdev.moneyapi.api.repository.posting;
 
+import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticCategory;
+import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticDay;
+import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticPerson;
 import br.com.diogotorresdev.moneyapi.api.model.*;
 import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
 import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
@@ -19,12 +22,85 @@ import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PostingRepositoryImpl implements PostingRepositoryQuery {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public List<PostingStatisticCategory> byCategory(LocalDate monthReference) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostingStatisticCategory> criteria = criteriaBuilder.createQuery(PostingStatisticCategory.class);
+        Root<Posting> root = criteria.from(Posting.class);
+
+        criteria.select(criteriaBuilder.construct(PostingStatisticCategory.class,
+                root.get(Posting_.category), criteriaBuilder.sum(root.get(Posting_.postingValue))));
+
+        LocalDate firstDayOfMonth = monthReference.withDayOfMonth(1);
+        LocalDate lastDayOfMonth = monthReference.withDayOfMonth(monthReference.lengthOfMonth());
+
+        criteria.where(criteriaBuilder.greaterThanOrEqualTo(root.get(Posting_.dueDate), firstDayOfMonth),
+                criteriaBuilder.lessThanOrEqualTo(root.get(Posting_.dueDate), lastDayOfMonth));
+
+        criteria.groupBy(root.get(Posting_.category));
+
+        TypedQuery<PostingStatisticCategory> query = entityManager.createQuery(criteria);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<PostingStatisticPerson> byPerson(LocalDate init, LocalDate end) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostingStatisticPerson> criteria = criteriaBuilder.createQuery(PostingStatisticPerson.class);
+        Root<Posting> root = criteria.from(Posting.class);
+
+        criteria.select(criteriaBuilder.construct(
+                PostingStatisticPerson.class,
+                root.get(Posting_.postingType),
+                root.get(Posting_.person),
+                criteriaBuilder.sum(root.get(Posting_.postingValue))
+        ));
+
+
+        criteria.where(criteriaBuilder.greaterThanOrEqualTo(root.get(Posting_.dueDate), init),
+                criteriaBuilder.lessThanOrEqualTo(root.get(Posting_.dueDate), end));
+
+        criteria.groupBy(root.get(Posting_.postingType),root.get(Posting_.person));
+
+        TypedQuery<PostingStatisticPerson> query = entityManager.createQuery(criteria);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<PostingStatisticDay> byDay(LocalDate monthReference) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PostingStatisticDay> criteria = criteriaBuilder.createQuery(PostingStatisticDay.class);
+        Root<Posting> root = criteria.from(Posting.class);
+
+        criteria.select(criteriaBuilder.construct(
+                PostingStatisticDay.class,
+                root.get(Posting_.postingType),
+                root.get(Posting_.dueDate),
+                criteriaBuilder.sum(root.get(Posting_.postingValue))
+        ));
+
+        LocalDate firstDayOfMonth = monthReference.withDayOfMonth(1);
+        LocalDate lastDayOfMonth = monthReference.withDayOfMonth(monthReference.lengthOfMonth());
+
+        criteria.where(criteriaBuilder.greaterThanOrEqualTo(root.get(Posting_.dueDate), firstDayOfMonth),
+                criteriaBuilder.lessThanOrEqualTo(root.get(Posting_.dueDate), lastDayOfMonth));
+
+        criteria.groupBy(root.get(Posting_.postingType),root.get(Posting_.dueDate));
+
+        TypedQuery<PostingStatisticDay> query = entityManager.createQuery(criteria);
+
+        return query.getResultList();
+    }
 
     @Override
     public Page<Posting> filter(PostingFilter postingFilter, Pageable pageable) {

@@ -1,0 +1,92 @@
+<!-- Created with Jaspersoft Studio version 7.0.0.final using JasperReports Library version 7.0.0-b478feaa9aab4375eba71de77b4ca138ad2f62aa  -->
+<jasperReport name="posting-per-person" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="71255d9d-1bcc-427b-9f33-4d5af218b9e8">
+	<parameter name="DT_INIT" class="java.util.Date"/>
+	<parameter name="DT_END" class="java.util.Date"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="total" class="java.math.BigDecimal"/>
+	<field name="postingType" class="br.com.diogotorresdev.moneyapi.api.model.enums.PostingType"/>
+	<field name="person" class="br.com.diogotorresdev.moneyapi.api.model.Person"/>
+	<title height="61" splitType="Stretch">
+		<element kind="textField" uuid="9b5b559e-5774-48ba-93f4-e92bfdcab141" x="5" y="10" width="544" height="41" fontSize="18.0" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA["Lançamentos por pessoa de " + DATEFORMAT($P{DT_INIT}, "dd/MM/yyyy") + " até " + DATEFORMAT($P{DT_END}, "dd/MM/yyyy")]]></expression>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</title>
+	<columnHeader height="25" splitType="Stretch">
+		<element kind="rectangle" uuid="d91414e1-e738-430c-a8b3-37dc286cb7b3" x="0" y="0" width="555" height="25" backcolor="#D4D4D4">
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+		</element>
+		<element kind="line" uuid="e2990e63-df40-4804-ba45-317c5a6e5e86" x="80" y="0" width="1" height="25">
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="line" uuid="cd0d4b7e-00ee-415c-8b1d-18c29c1f4eb4" x="480" y="0" width="1" height="25">
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="staticText" uuid="e52c8b32-a425-4d55-9fbe-943286caac89" x="1" y="1" width="79" height="23" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Tipo]]></text>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<element kind="staticText" uuid="366a0890-d142-4bb0-b13c-c4329c00fcf2" x="483" y="0" width="74" height="25" markup="none" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Total]]></text>
+		</element>
+		<element kind="staticText" uuid="2d655d27-2940-4b27-9c20-071573e91c08" x="81" y="1" width="398" height="23" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Pessoa]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<element kind="line" uuid="08ccb2e9-1ea9-42ba-b216-3c89f38a309c" x="0" y="0" width="1" height="25">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="line" uuid="90612fe7-8ef3-4db2-981b-479d468f385d" x="80" y="0" width="1" height="25">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="line" uuid="23d52f48-ace5-450d-8914-38b17f9477f5" x="480" y="0" width="1" height="25">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="line" uuid="08f32bb1-3061-4182-99f5-e771efaab20c" x="554" y="0" width="1" height="25">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="line" uuid="2f874a4d-8481-4fc0-8b08-24a77e033380" x="0" y="24" width="555" height="1"/>
+			<element kind="textField" uuid="0d4dd454-fd60-44c1-862d-e30a3238ec35" x="5" y="1" width="70" height="22" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{postingType}.getDescricao()]]></expression>
+			</element>
+			<element kind="textField" uuid="9a505dfb-a397-43d4-b262-c99f3e993d10" x="85" y="1" width="384" height="22" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{person}.getPersonName()]]></expression>
+			</element>
+			<element kind="textField" uuid="f400156e-f610-42c0-8c95-297eca8f842d" x="484" y="1" width="67" height="22" pattern="¤#,##0.##;¤-#,##0.00" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{total}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<pageFooter height="25" splitType="Stretch">
+		<element kind="textField" uuid="261d2e48-2590-47a4-908a-7902e189a99c" x="1" y="0" width="140" height="25" vTextAlign="Middle">
+			<expression><![CDATA["Data: " + DATEFORMAT(TODAY(), "dd/MM/yyyy")]]></expression>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+		</element>
+		<element kind="textField" uuid="4dc79d6e-00fc-47e0-b64c-08be65db7aaa" x="454" y="0" width="100" height="25" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA[$V{PAGE_NUMBER}]]></expression>
+			<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</element>
+		<property name="com.jaspersoft.studio.unit.height" value="px"/>
+	</pageFooter>
+</jasperReport>

@@ -1,5 +1,7 @@
 package br.com.diogotorresdev.moneyapi.api.resource;
 
+import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticCategory;
+import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticDay;
 import br.com.diogotorresdev.moneyapi.api.event.ResourceCreatedEvent;
 import br.com.diogotorresdev.moneyapi.api.model.Posting;
 import br.com.diogotorresdev.moneyapi.api.repository.PostingRepository;
@@ -13,7 +15,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +26,10 @@ import br.com.diogotorresdev.moneyapi.api.exceptionhandler.MoneyApiExceptionHand
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/posting")
@@ -39,6 +46,29 @@ public class PostingResource {
 
     @Autowired
     private MessageSource messageSource;
+
+
+    @GetMapping("/reports/by-person")
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
+    public ResponseEntity<byte[]> reportByPerson(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate init,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) throws Exception {
+        byte[] report = postingService.reportByPerson(init,end);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE).body(report);
+    }
+
+    @GetMapping("/statistic/by-category")
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
+    public List<PostingStatisticCategory> byCategory(){
+        return this.postingRepository.byCategory(LocalDate.now());
+    }
+
+    @GetMapping("/statistic/by-day")
+    @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
+    public List<PostingStatisticDay> byDay(){
+        return this.postingRepository.byDay(LocalDate.now());
+    }
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")

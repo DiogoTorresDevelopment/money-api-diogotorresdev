@@ -1,6 +1,7 @@
 package br.com.diogotorresdev.moneyapi.api.model;
 
 import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,6 +56,11 @@ public class Posting {
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
+
+    @JsonIgnore
+    public boolean isRevenue(){
+        return PostingType.RECEITA.equals(this.postingType);
+    }
 
     public Posting() {
     }
