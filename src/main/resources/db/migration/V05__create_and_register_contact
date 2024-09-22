@@ -1,0 +1,24 @@
+CREATE TABLE contact (
+     id BIGSERIAL PRIMARY KEY,
+     name VARCHAR(50) NOT NULL,
+     email VARCHAR(100) NOT NULL,
+     phone VARCHAR(20) NOT NULL,
+     person_id BIGSERIAL NOT NULL,
+        FOREIGN KEY (person_id) REFERENCES person(id)
+);
+
+INSERT INTO
+    contact (
+    name,
+    email,
+    phone,
+    person_id,
+)
+VALUES
+    (
+        'Marcos henrique',
+        'diogo@emid.com.br',
+        '00 0000-0000',
+        1
+    );
+

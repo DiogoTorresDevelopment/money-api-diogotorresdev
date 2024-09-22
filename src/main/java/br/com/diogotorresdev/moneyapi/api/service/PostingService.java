@@ -16,6 +16,8 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -37,6 +39,7 @@ public class PostingService {
 
     private static final String RECIPIENTS = "ROLE_VIEW_POSTING";
 
+    private static final Logger logger = LoggerFactory.getLogger(PostingService.class);
 
     @Autowired
     private PostingRepository postingRepository;
@@ -59,15 +62,33 @@ public class PostingService {
     //cron = segundo minuto hora diaDoMes oMes diaDaSemana
     @Scheduled(cron = "0 0 6 * * *")
     public void notifyOnPostingsExpired(){
+        if(logger.isDebugEnabled()){
+            logger.debug("Preparando Envio de e-mails de aviso de lançamentos vencidos");
+        }
+
         List<Posting> expireds = postingRepository
                 .findByDueDateLessThanEqualAndPaymentDateIsNull(LocalDate.now());
+
+        if(expireds.isEmpty()){
+            logger.info("Sem lançamentos vencidos para aviso!");
+
+            return;
+        }
+
+        logger.info("Existem {} lançamentos vencidos.", expireds.size());
 
         List<UserAccount> recipients = userAccountRepository
                 .findByPermissionsPermissionDescription(RECIPIENTS);
 
+        if(recipients.isEmpty()){
+            logger.warn("Existem lançamentos vencidos, mais o sistema não encontrou destinatarios");
+            return;
+        }
+
 
         mailer.sendEmailNotificationPostingsExpired(expireds, recipients);
 
+        logger.info("Envio de e-mail de aviso concluído.");
     }
 
 

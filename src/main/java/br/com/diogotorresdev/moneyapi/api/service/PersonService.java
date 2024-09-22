@@ -16,6 +16,11 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
+    public Person save(Person person) {
+        person.getContacts().forEach(c -> c.setPerson(person));
+        return personRepository.save(person);
+    }
+
     public Person findById(Long id) {
         Person personSaved = personRepository.findOne(id);
 
@@ -41,8 +46,11 @@ public class PersonService {
     public Person update(Long id, Person person) {
         Person personSaved = findById(id);
 
-        BeanUtils.copyProperties(person, personSaved, "id");
+        personSaved.getContacts().clear();
+        personSaved.getContacts().addAll(person.getContacts());
+        personSaved.getContacts().forEach(c -> c.setPerson(personSaved));
 
+        BeanUtils.copyProperties(person, personSaved, "id","contacts");
         personRepository.save(personSaved);
 
         return personSaved;
@@ -67,4 +75,5 @@ public class PersonService {
             throw new InactiveOrNonExistentPersonException();
         }
     }
+
 }

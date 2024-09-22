@@ -2,6 +2,7 @@ package br.com.diogotorresdev.moneyapi.api.model;
 
 import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,6 +53,7 @@ public class Posting {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @JsonIgnoreProperties("contacts")
     @NotNull
     @ManyToOne
     @JoinColumn(name = "person_id")
