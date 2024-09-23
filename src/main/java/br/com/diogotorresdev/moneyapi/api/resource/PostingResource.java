@@ -9,6 +9,7 @@ import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
 import br.com.diogotorresdev.moneyapi.api.repository.projection.PostingProjection;
 import br.com.diogotorresdev.moneyapi.api.service.PostingService;
 import br.com.diogotorresdev.moneyapi.api.service.exception.PersonNonexistentOrInactiveException;
+import br.com.diogotorresdev.moneyapi.api.storage.S3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -23,9 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import br.com.diogotorresdev.moneyapi.api.exceptionhandler.MoneyApiExceptionHandler.Error;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +52,23 @@ public class PostingResource {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private S3 s3;
+
+    @PreAuthorize("hasAuthority('ROLE_REGISTER_POSTING') and #oauth2.hasScope('write')")
+    @PostMapping("/upload_file")
+    public String uploadFile(@RequestParam MultipartFile file) throws IOException {
+//        OutputStream out = new FileOutputStream(
+//                "/Users/emid.dev.macbook.pro/Desktop/code-centauri/cursos/springBootFullStackCourseAlgaWorks/my-projects/files/postings/"
+//                        + file.getOriginalFilename());
+//
+//        out.write(file.getBytes());
+//        out.close();
+
+        String name = s3.saveTemporary(file);
+
+        return name;
+    }
 
     @GetMapping("/reports/by-person")
     @PreAuthorize("hasAuthority('ROLE_VIEW_POSTING') and #oauth2.hasScope('read')")
