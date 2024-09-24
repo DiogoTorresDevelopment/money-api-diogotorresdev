@@ -12,6 +12,7 @@ import br.com.diogotorresdev.moneyapi.api.repository.filter.PostingFilter;
 import br.com.diogotorresdev.moneyapi.api.repository.projection.PostingProjection;
 import br.com.diogotorresdev.moneyapi.api.service.exception.InactiveOrNonExistentPersonException;
 import br.com.diogotorresdev.moneyapi.api.service.exception.PersonNonexistentOrInactiveException;
+import br.com.diogotorresdev.moneyapi.api.storage.S3;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.sql.Date;
@@ -53,6 +55,8 @@ public class PostingService {
     @Autowired
     private Mailer mailer;
 
+    @Autowired
+    private S3 s3;
 //    Exemplo delay fixo
 //    @Scheduled(fixedDelay = 1000 * 2)
 //    public void notifyOnPostingsExpired(){
@@ -113,6 +117,10 @@ public class PostingService {
 
         if (person == null || person.isInactive()) {
             throw new InactiveOrNonExistentPersonException();
+        }
+
+        if(StringUtils.hasText(posting.getFileAttachment())){
+            s3.saveFile(posting.getFileAttachment());
         }
 
         return postingRepository.save(posting);

@@ -4,16 +4,7 @@ import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
@@ -58,6 +49,12 @@ public class Posting {
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
+
+    @Column(name = "file_attachment")
+    private String fileAttachment;
+
+    @Transient
+    private String urlFileAttachment;
 
     @JsonIgnore
     public boolean isRevenue(){
@@ -177,4 +174,19 @@ public class Posting {
         return true;
     }
 
+    public String getFileAttachment() {
+        return fileAttachment;
+    }
+
+    public void setFileAttachment(String fileAttachment) {
+        this.fileAttachment = fileAttachment;
+    }
+
+    public String getUrlFileAttachment() {
+        return urlFileAttachment;
+    }
+
+    public void setUrlFileAttachment(String urlFileAttachment) {
+        this.urlFileAttachment = urlFileAttachment;
+    }
 }

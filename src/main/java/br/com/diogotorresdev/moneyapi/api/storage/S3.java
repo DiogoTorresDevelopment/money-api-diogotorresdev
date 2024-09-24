@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 @Component
@@ -57,9 +59,23 @@ public class S3 {
         }
     }
 
+    public String configurationURL(String obj){
+        return "\\\\" + property.getS3().getBucket() + ".s3.amazonaws.com/" + obj;
+    }
+
+    public void saveFile(String obj) {
+
+        SetObjectTaggingRequest setObjectTaggingRequest = new SetObjectTaggingRequest(
+                property.getS3().getBucket(), obj, new ObjectTagging(Collections.emptyList()));
+
+        amazonS3.setObjectTagging(setObjectTaggingRequest);
+
+    }
+
     private String generateUniqueName(String originalFilename) {
 
         return UUID.randomUUID().toString() + "_" + originalFilename;
     }
+
 
 }

@@ -1,5 +1,6 @@
 package br.com.diogotorresdev.moneyapi.api.resource;
 
+import br.com.diogotorresdev.moneyapi.api.dto.FileAttachment;
 import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticCategory;
 import br.com.diogotorresdev.moneyapi.api.dto.PostingStatisticDay;
 import br.com.diogotorresdev.moneyapi.api.event.ResourceCreatedEvent;
@@ -57,7 +58,7 @@ public class PostingResource {
 
     @PreAuthorize("hasAuthority('ROLE_REGISTER_POSTING') and #oauth2.hasScope('write')")
     @PostMapping("/upload_file")
-    public String uploadFile(@RequestParam MultipartFile file) throws IOException {
+    public FileAttachment uploadFile(@RequestParam MultipartFile fileAttachment) throws IOException {
 //        OutputStream out = new FileOutputStream(
 //                "/Users/emid.dev.macbook.pro/Desktop/code-centauri/cursos/springBootFullStackCourseAlgaWorks/my-projects/files/postings/"
 //                        + file.getOriginalFilename());
@@ -65,9 +66,9 @@ public class PostingResource {
 //        out.write(file.getBytes());
 //        out.close();
 
-        String name = s3.saveTemporary(file);
+        String name = s3.saveTemporary(fileAttachment);
 
-        return name;
+        return new FileAttachment(name, s3.configurationURL(name));
     }
 
     @GetMapping("/reports/by-person")
