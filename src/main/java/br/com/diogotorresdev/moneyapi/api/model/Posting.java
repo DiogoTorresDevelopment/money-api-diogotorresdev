@@ -1,6 +1,7 @@
 package br.com.diogotorresdev.moneyapi.api.model;
 
 import br.com.diogotorresdev.moneyapi.api.model.enums.PostingType;
+import br.com.diogotorresdev.moneyapi.api.repository.listener.PostingFileAttachmentListener;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@EntityListeners(PostingFileAttachmentListener.class)
 @Entity
 @Table(name = "posting")
 public class Posting {

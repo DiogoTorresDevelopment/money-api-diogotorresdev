@@ -155,6 +155,12 @@ public class PostingService {
             personService.validatePerson(posting.getPerson().getId());
         }
 
+        if(StringUtils.isEmpty(posting.getFileAttachment()) && StringUtils.hasText(posting.getFileAttachment())){
+            s3.remove(postingSaved.getFileAttachment());
+        }else if(StringUtils.hasText(posting.getFileAttachment()) && !posting.getFileAttachment().equals(postingSaved.getFileAttachment())){
+            s3.toReplaceFileAttachment(postingSaved.getFileAttachment(), posting.getFileAttachment());
+        }
+
         BeanUtils.copyProperties(posting, postingSaved, "id");
 
         postingRepository.save(postingSaved);
